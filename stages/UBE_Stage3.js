@@ -1,29 +1,8 @@
 import {parse} from 'tldts';
 
 const FEATURES_FULL = {
-    "favicon_check": 3,
-    "url_anchor": 4,
-    "links_in_tags": 10,
-    "request_sources_from_diff_url": 3,
-    "sfh": 5,
-    "iframe": 11,
-    "suspicious_js": 11,
-    "nlp_text": 1,
-    "detect_auto_redirect": 3,
-    "check_login_form_visibility": 1,
-    "detect_right_click_block": 2,
-}
-const FEATURES_INITIAL = {
-    "favicon_check": 3,
-    "url_anchor": 4,
-    "links_in_tags": 10,
-    "request_sources_from_diff_url": 3,
-    "sfh": 5,
-    "iframe": 11,
-    "suspicious_js": 11,
-    "nlp_text": 1,
-    "detect_right_click_block": 2,
-}
+features
+};
 const INITIAL = 0;
 const FULL = 1;
 

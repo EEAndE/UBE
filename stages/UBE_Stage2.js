@@ -13,19 +13,7 @@ const RESPONSE_HEADERS = {
 const TIMEOUT_WHOIS = 3000;
 const TIMEOUT_REDIRECTS = 3000;
 const HEADERS = [
-    'Final Domain',
-    'SSL Exists',
-    'SSL Valid',
-    'SSL Issuer',
-    'Domain Age',
-    'Domain Expiry',
-    'Domain Registrar',
-    'VT Reputation',
-    'VT Malicious',
-    'VT Suspicious',
-    'VT Undetected',
-    'VT Harmless',
-    'Different Domains'
+    HEADERS
 ]
 
 export function followRedirects(parsedOriginalURL) {
@@ -348,7 +336,6 @@ async function getResults(parsedFullURL, finalDomain, data) {
     const differentDomains = getDomain(parsedFullURL.hostname) !== finalDomain ? 1 : 0;
     const attributes = data?.data?.attributes || {};
     const reputation = attributes.reputation ?? null;
-    const lastAnalysisStats = attributes.last_analysis_stats ?? null;
     const certificate = attributes.last_https_certificate ?? null;
     let whois = attributes.whois ?? null;
 
@@ -357,10 +344,6 @@ async function getResults(parsedFullURL, finalDomain, data) {
         throw new Error('Missing reputation score');
     }
 
-    if (lastAnalysisStats == null) {
-        console.error(`Last analysis stats not found for domain ${finalDomain}`);
-        throw new Error('Missing last analysis stats');
-    }
 
     if (whois == null) {
         console.warn(`WHOIS info not found for ${finalDomain}, retrying fallback`);
@@ -373,10 +356,10 @@ async function getResults(parsedFullURL, finalDomain, data) {
 
     console.log(`Successfully extracted results for ${finalDomain}`);
 
-    return constructResultsDict(parsedFullURL, finalDomain, certificateDetails, whois, reputation, lastAnalysisStats, differentDomains);
+    return constructResultsDict(parsedFullURL, finalDomain, certificateDetails, whois, reputation, differentDomains);
 }
 
-function constructResultsDict(parsedFullURL, finalDomain, certificateDetails, whois, reputation, lastAnalysisStats, differentDomains) {
+function constructResultsDict(parsedFullURL, finalDomain, certificateDetails, whois, reputation, differentDomains) {
     const parseResults = [
         finalDomain,
         certificateDetails['Exists'],
@@ -386,10 +369,6 @@ function constructResultsDict(parsedFullURL, finalDomain, certificateDetails, wh
         whois['Expiry'],
         whois['Registrar'],
         Number(reputation),
-        lastAnalysisStats['malicious'],
-        lastAnalysisStats['suspicious'],
-        lastAnalysisStats['undetected'],
-        lastAnalysisStats['harmless'],
         differentDomains
     ]
 

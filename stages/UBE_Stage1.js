@@ -195,7 +195,7 @@ export async function processURL(rawURL) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({url: rawURL})
+            body: ""
         });
 
         if (response.ok) {
