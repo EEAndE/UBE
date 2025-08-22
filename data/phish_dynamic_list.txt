@@ -1,12 +1,2 @@
-||amazon.com^$all
 ||bit.ly/fake$document,frame
 ||developer.mozilla.org/en-US/$document,frame
-||google.com^$all
-||idpprod.mta.ac.il/nidp/app/login$document,frame
-||login-secure-paypal.com^$all
-||login-secure-paypaleatshittt5ttt.com^$all
-||micr0s0ft-support.example^$all
-||microsoft.com^$all
-||paypal.com^$all
-||verificar-meuconta.com^$all
-||w3schools.com/howto/howto_css_login_form.asp$document,frame
