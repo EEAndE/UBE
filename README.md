@@ -10,8 +10,8 @@
 <p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#overview">Overview</a> •
-  <a href="#architecture--detection-pipeline">Architecture & Detection Pipeline</a>
-  <a href="#installation--usage">Insallation & Usage</a> •
+  <a href="#architecture--detection-pipeline">Architecture & Detection Pipeline</a> •
+  <a href="#installation--usage">Installation & Usage</a> •
   <a href="#screenshots">Screenshots</a> •
   <a href="#to-do">TO-DO</a> •
   <a href="#license">License</a>
@@ -35,7 +35,7 @@ It enhances UBO by enabling real-time detection of phishing threats using machin
 The extension analyzes various website elements including URLs, domain metadata, HTML structure, and JavaScript behavior to identify suspicious activity.
 
 Unlike static blacklists, UBE adds a dynamic intelligence layer. The extension runs a local ML model for instant decisions and then reports suspected URLs in batches to a backend server.
-The server continuously validates new threats, writing only verified results to a shared blocklist. This turns traditional static blocklists into an evolving, real-time protection layer, helping block future threats before they reach users’ browsers.
+The server continuously validates new threats, writing only verified results to a shared blocklist. This turns traditional static blocklists into an evolving, real-time protection layer, helping block future threats before they reach users' browsers.
 
 ## Architecture & Detection Pipeline
 
