@@ -95,11 +95,7 @@ export const UBECore = {
         UBEAnalysis.initWorker()
             .then(() => {
                 const successCommit = UBEEvents.registerOnCommittedListener();
-               UBENetwork.init({
-                baseUrl: 'http://127.0.0.1:8000',   
-                threshold: 0.5,
-                    flushIntervalMs: 10000
-                }).catch(e => ubolog(`${UBECore.LOG_ICONS.WARNING} UBE-Net init failed: ${e}`));
+				UBENetwork.init({baseUrl: 'http://127.0.0.1:8000', threshold: 0.5, flushIntervalMs: 10000}).catch(e => ubolog(`${UBECore.LOG_ICONS.WARNING} UBE-Net init failed: ${e}`));
 
                 if (successCommit) {                    
                     if (µb.assetManager?.setListEnabled )
@@ -192,7 +188,7 @@ export const UBECore = {
             return;
         }
         
-        await UBEEvents.registerUbeEventHandlers();
+        await this.loadAssetsFromRegistry();
        
         if (_state.enabled) {
             UBEAnalysis.initWorker()
@@ -224,10 +220,11 @@ export const UBECore = {
          await io.registerAssetSource( 'phishing-UBE', {
          content: 'filters',
          group:   'malware',           
-         title:   'UBE Blocklist',
+         title:   'UBE Phishing URL Blocklist',
          contentURL: [
 			"https://raw.githubusercontent.com/EEAndE/UBE/main/blocklist/urls.txt"
          ],
+		 updateAfter: 0.003,
          off: false,   
          submitter: 'UBE',                 
          supportURL: "https://github.com/EEAndE/UBE/main/blocklist/urls.txt"
@@ -237,79 +234,9 @@ export const UBECore = {
     async loadAssetsFromRegistry() {
 
         await getAssetSourceRegistry();
-        await UBECore.ubeInitAssets();
+        await this.ubeInitAssets();
 
         ubolog('✅ UBE: Custom assets registered.');
-    },
-
-    async takeAssetsFromRegistry() {
-		try {
-			ubolog('✅ UBE: Model Blob created successfully!');
-
-			const apiKeyAsset = await io.get('ube-api-key');
-			if (apiKeyAsset?.content) {
-				UBECore.apiKey = JSON.parse(apiKeyAsset.content).api_key;
-				ubolog(`✅ UBE: Loaded API key from asset registry ${UBECore.apiKey}`);
-			} else {
-				ubolog(`⚠️ UBE: API key asset not found`);
-			}
-		} catch (e) {
-			ubolog(`❌ UBE: Failed to load assets: ${e.message}`);
-		}
-	},
-	
-	async takeAssetsFromRegistry() {
-		try {
-			const modelAsset = await io.get('ube-model');
-			if (!modelAsset?.content) {
-				ubolog('🚫 UBE: ube-model asset not found');
-				return;
-			}
-			ubolog('✅ UBE: Loaded model from asset registry');
-
-			const cleanedModelCode = modelAsset.content
-		.replace(/export\s*\{[^}]*\};?\s*$/m, '')
-		.concat('\nself.predictPhishing = l1;');
-
-			const workerCode = `
-				${cleanedModelCode}
-
-				self.predictPhishing = predictPhishing;
-
-				console.log("🚀 Worker loaded predictPhishing!");
-
-				self.onmessage = (msg) => {
-					console.log("Worker received message:", msg.data);
-					const { id, tabId, what, input } = msg.data;
-					if (what === 'predict') {
-						const result = self.predictPhishing(input);
-						self.postMessage({
-							what: 'predictionResult',
-							id,
-							tabId,
-							result,
-							error: null
-						});
-					}
-				};
-
-				self.postMessage({ what: 'workerReady' });
-			`;
-			const blob = new Blob([workerCode], { type: 'application/javascript' });
-			UBECore.modelBlobUrl = URL.createObjectURL(blob);
-
-			ubolog('✅ UBE: Model Blob created successfully!');
-
-			const apiKeyAsset = await io.get('ube-api-key');
-			if (apiKeyAsset?.content) {
-				UBECore.apiKey = apiKeyAsset.content;
-				ubolog(`✅ UBE: Loaded API key from asset registry`);
-			} else {
-				ubolog(`⚠️ UBE: API key asset not found`);
-			}
-		} catch (e) {
-			ubolog(`❌ UBE: Failed to load assets: ${e.message}`);
-		}
     },
 
     validateCapacity(tabId) {

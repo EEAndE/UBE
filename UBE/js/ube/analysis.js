@@ -12,6 +12,8 @@ const modelWorker = {
 };
 
 const _sendToWorker = (tabId, data) => {
+    // generates a new UUID
+    //
     const id = crypto.randomUUID();
     // resolves through worker's onmessage via the appropriate id
     return new Promise((resolve, reject) => {
@@ -29,6 +31,7 @@ const _sendToWorker = (tabId, data) => {
 
 const _getStageResults = async (tabId, url, fn, stage) => {
     try {
+        // await result via passed function (fn) argument
         const result = await fn(tabId, url);
 
         ubolog(`${UBECore.LOG_ICONS.ADVANCED} UBE: (Stage ${stage}) Finished for Tab ${tabId}`);
@@ -54,10 +57,13 @@ export const UBEAnalysis = {
             return;
         }
 
+        // create a new worker instance
+        // add an onmessage handler for requests
         return new Promise((resolve, reject) => {
             modelWorker.instance = new Worker(
                 vAPI.getURL('/js/ube/model_worker.js'),
                 {type: 'module'});
+            // onmessage handler
             modelWorker.instance.onmessage = (msg) => {
                 const data = msg.data;
 
@@ -66,6 +72,7 @@ export const UBEAnalysis = {
                     return;
                 }
 
+                // web worker ready message
                 if (data.what === 'workerReady') {
                     modelWorker.ready = true;
                     resolve();
@@ -73,9 +80,15 @@ export const UBEAnalysis = {
                     return;
                 }
 
+                if (!modelWorker.ready) {
+                    reject(new Error(`Unexpected message during initialization: ${data.what || 'Unknown'}`));
+                    return;
+                }
+
                 const {id, tabId, result, error} = msg.data;
                 const pending = modelWorker.pending.get(id);
 
+                // handle pending result
                 if (pending) {
                     modelWorker.pending.delete(id);
 
@@ -91,7 +104,7 @@ export const UBEAnalysis = {
             }
 
             modelWorker.instance.onerror = (error) => {
-                ubolog(`${UBECore.LOG_ICONS.ERROR} UBE: Worker onerror: ${error}`);
+                ubolog(`${UBECore.LOG_ICONS.ERROR} UBE: Web worker error: ${error}`);
                 reject(error);
             };
         });
@@ -125,6 +138,8 @@ export const UBEAnalysis = {
     },
 
     async predict(tabId, combinedResults) {
+        // send a request to worker to predict
+        // validate response and return results
         try {
             const prediction = await _sendToWorker(tabId, combinedResults);
             const validation = prediction.validation;
@@ -150,6 +165,8 @@ export const UBEAnalysis = {
     },
 
     async processAllStages(tabId, url) {
+        // awaits all stages and prediction
+        // constructs and returns a result dictionary
         const [firstAndSecondStagesResult, thirdStageResult] = await Promise.all([
             this.getFirstAndSecondStagesResults(tabId, url),
             this.getThirdStageResults(tabId, url)

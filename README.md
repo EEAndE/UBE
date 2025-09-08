@@ -40,7 +40,7 @@ The server continuously validates new threats, writing only verified results to 
 ## Architecture & Detection Pipeline
 
 ### Client (Browser Extension)
-Hooks into navigation events and page activity. Checks extended static lists first (`uBO` + optional dynamic list). If a URL isn’t covered by those static lists, a local model (`Web Worker`) scores it using staged features. Visual indicators (icon/badge/banner/notification) warn users in real time. URLs that look malicious are added to a small local batch queue and periodically flushed to the server with a unique user `API KEY`.
+Hooks into navigation events and page activity. Checks extended static lists first (`uBO` + optional dynamic list). If a URL isn’t covered by those static lists, a local model (`Web Worker` using LightGBM) scores it using staged features. Visual indicators (icon/badge/banner/notification) warn users in real time. URLs that look malicious are added to a small local batch queue and periodically flushed to the server with a unique user `API KEY`.
 
 ### Server (Validation & Daily Routine)
 Receives batched candidates from many clients. Re-extracts features (URL, domain/WHOIS/reputation, optional DOM/JS) and scores with a Python model. Only high-confidence results (by probability threshold) are inserted into the DB.

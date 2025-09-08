@@ -2,6 +2,21 @@ import {ubolog} from '../console.js';
 import {UBECore} from './core.js';
 import {UBEAnalysis} from './analysis.js';
 import {UBENetwork} from './network.js'; 
+import {domainFromURI, entityFromDomain} from '../uri-utils.js';
+
+const skipDomains = new Set(['google.*', 'facebook.*', 'youtube.*', 'duckduckgo.*', 'bing.*', 'wikipedia.*']);
+
+const _skipURL = (url) => {
+    const domain = domainFromURI(url); // might not work for IP's
+
+    if (!domain) {
+        return false;
+    }
+
+    const entity = entityFromDomain(domain);
+
+    return skipDomains.has(entity);
+};
 
 const _handleProcessingSuccess = (tabId, url, combinedResults) => {
     if (!UBECore.enabled) {
@@ -92,8 +107,17 @@ export const UBEProcessing = {
         UBECore.updateTabIcon(tabId);
 
         try {
-            const finalResults = await UBEAnalysis.processAllStages(tabId, url)
+            let finalResults;
+
+            if (_skipURL(url)) {
+                ubolog(`${UBECore.LOG_ICONS.INFO} UBE: Skipping trusted domain at Tab ${tabId} - ${url}`);
+                finalResults = {'Prediction': 'Safe', 'Extra': 'Trusted'};
+            } else {
+                finalResults = await UBEAnalysis.processAllStages(tabId, url);
+            }
+
             _handleProcessingSuccess(tabId, url, finalResults);
+			
 			UBENetwork.reportPrediction(url, finalResults['Prediction']).catch(e => ubolog(`${UBECore.LOG_ICONS.WARNING} UBE-Net: reportPrediction error: ${e}`)); 
 		} catch (error) {
             _handleProcessingError(tabId, url, error);
