@@ -146,7 +146,7 @@ curl -s -X POST -H "X-API-KEY: %API_KEY%" http://localhost:8000/debug/run_daily
 ```
 
 ## Screenshots & demo
-<h3 align="center">Full functional demo</h3
+<h3 align="center">Full functional demo</h3>
 https://github.com/user-attachments/assets/720d1d2b-111c-4048-a5d4-78c5b5c20565
 
 
