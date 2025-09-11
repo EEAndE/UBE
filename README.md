@@ -90,44 +90,66 @@ python -m backend.app.server
 
 1. **Issue an API key (no auth required)**
 ```bash
+#powershell
+$API_KEY = (Invoke-RestMethod http://localhost:8000/get_api_key).api_key
+
+#cmd
 curl -s http://localhost:8000/get_api_key
+set API_KEY=<paste-api-key-here>
+
 # → {"api_key":"<hex>"}
 ```
 
 2. **Status without a key → 401**
-```bash
+```powershell
+#cmd
 curl -i http://localhost:8000/
+# → {"api_key":"<hex>"}
 ```
 
 3. **Status with a key → 200**
 ```bash
-API_KEY="<paste-from-step-1>"
+#cmd
+set API_KEY="<paste-from-step-1>"
 curl -s -H "X-API-KEY: $API_KEY" http://localhost:8000/
 ```
 
 4. **Returns today's submissions**
 ```bash
-API_KEY="<paste-from-step-1>"
-curl -s -H "X-API-KEY: $API_KEY" http://localhost:8000/debug/daily_submissions
+#powershell
+curl.exe -s -H "X-API-KEY: $API_KEY" http://localhost:8000/debug/daily_submissions
+#cmd
+curl -s -H "X-API-KEY: %API_KEY%" http://localhost:8000/debug/daily_submissions
 # gets the daily submissions
 ```
 
 5. **Returns recent URLs in the database**
 ```bash
-API_KEY="<paste-from-step-1>"
-curl -s -H "X-API-KEY: $API_KEY" http://localhost:8000/debug/db_recent
+#powershell
+curl.exe -s -H "X-API-KEY: $API_KEY" http://localhost:8000/debug/db_recent
+#cmd
+curl -s -H "X-API-KEY: %API_KEY%" http://localhost:8000/debug/db_recent
 # gets the URLs currently in the database
 ```
 
 6. **Run full update pipeline**
 ```bash
-API_KEY="<paste-from-step-1>"
-curl -s -X POST -H "X-API-KEY: $API_KEY" http://localhost:8000/debug/run_daily
+#### Watch phishing sites get blocked in real time. Request an API key to explore the full potential.#####
+
+#powershell
+curl.exe -s -X POST -H "X-API-KEY: $API_KEY" http://localhost:8000/debug/run_daily
+
+#cmd
+curl -s -X POST -H "X-API-KEY: %API_KEY%" http://localhost:8000/debug/run_daily
+
+#### Watch phishing sites get blocked in real time. Request an API key to explore the full potential.#####
 # Runs the full pipeline including data validation and updating the shared blocklist.
 # Future users will automatically benefit from updated phishing site protections.
 ```
 
-## Screenshots
+## Screenshots & demo
+https://github.com/user-attachments/assets/536296ab-39aa-4195-bc22-0f0005a38b6c
+
 <h3 align="center">
 Module activation
 <br>
